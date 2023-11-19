@@ -76,9 +76,21 @@ router.delete('/delete/:id', (req, res) => {
 
 // Define a route handler for GET requests to the '/count' path
 router.get('/count', (req, res) => {
-    // Perform an aggregation operation to count the number of employees in each department
+    // Perform an aggregation operation to count the number of employees in each department and calculate the average salary
     EmployeeModel.aggregate([
-        { $group: { _id: "$department", count: { $sum: 1 } } }
+        {
+            $group: {
+                _id: "$department",
+                count: { $sum: 1 },
+                averageSalary: { $avg: "$salary" }
+            }
+        },
+        {
+            $project: {
+                count: 1,
+                averageSalary: { $round: ["$averageSalary", 2] }
+            }
+        }
     ])
         .then(result => {
             // If the operation is successful, send the result as a JSON response
