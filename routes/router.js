@@ -74,5 +74,21 @@ router.delete('/delete/:id', (req, res) => {
         });
 });
 
+// Define a route handler for GET requests to the '/count' path
+router.get('/count', (req, res) => {
+    // Perform an aggregation operation to count the number of employees in each department
+    EmployeeModel.aggregate([
+        { $group: { _id: "$department", count: { $sum: 1 } } }
+    ])
+        .then(result => {
+            // If the operation is successful, send the result as a JSON response
+            res.json(result);
+        })
+        .catch(err => {
+            // If an error occurs while executing the operation, send a JSON response with a status code of 500 (Internal Server Error) and the error message
+            res.status(500).json({ error: err });
+        });
+});
+
 // Export the router so it can be used in other parts of the application
 module.exports = router;
